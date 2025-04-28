@@ -28,8 +28,8 @@ cd kundi
 
 # ![PLEASE MOVE THE `places.csv`, `media.csv` and `reviews.csv` files into this folder]!
 
-# Install dependencies
-pip install -r requirements.txt
+# Direct Run (Will install dependencies)
+python rag_run.py --build-index --embedding-model bge-large --auto-yes
 ```
 
 ### Complete Implementation Steps
