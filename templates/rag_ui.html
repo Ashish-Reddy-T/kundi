@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Search™ - Powered by RAG</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #7209b7;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f8f9fa;
+            color: var(--dark-color);
+        }
+        
+        .search-container {
+            background-color: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .brand {
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        .search-input {
+            border-radius: 30px 0 0 30px;
+            padding: 0.75rem 1.25rem;
+            border: 1px solid #dee2e6;
+            box-shadow: none;
+            font-size: 1.1rem;
+        }
+        
+        .search-button {
+            border-radius: 0 30px 30px 0;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .search-button:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .example-query {
+            border-radius: 20px;
+            padding: 0.25rem 0.75rem;
+            cursor: pointer;
+            margin-right: 0.4rem;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        
+        .example-query:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .card {
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-img-top {
+            height: 180px;
+            object-fit: cover;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .card-title {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .card-text {
+            color: #495057;
+        }
+        
+        .vibe-tag {
+            border-radius: 20px;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            margin-right: 0.25rem;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+        
+        .explanation {
+            font-style: italic;
+            padding: 0.75rem;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.025);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .location-badge {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 0.15rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            max-width: 100%;
+        }
+        
+        .map-link {
+            font-size: 0.85rem;
+        }
+        
+        .loading-container {
+            display: none;
+            margin: 2rem 0;
+        }
+        
+        .search-stats {
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .expanded-query {
+            font-style: italic;
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+        
+        .score-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 20px;
+            padding: 0.1rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        
+        footer {
+            margin-top: 3rem;
+            padding: 1.5rem 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* Map popover style */
+        .map-popover {
+            max-width: 300px;
+        }
+        
+        /* Vibe color classes */
+        .vibe-date-night { background-color: #ff5c8a; color: white; }
+        .vibe-work-friendly { background-color: #4cc9f0; color: white; }
+        .vibe-outdoor-vibes { background-color: #2ec4b6; color: white; }
+        .vibe-group-hangout { background-color: #ff9e00; color: white; }
+        .vibe-food-focus { background-color: #8ac926; color: white; }
+        .vibe-drinks-focus { background-color: #9d4edd; color: white; }
+        .vibe-coffee-tea { background-color: #6a4c93; color: white; }
+        .vibe-dancing-music { background-color: #f72585; color: white; }
+        .vibe-quiet-relaxing { background-color: #588157; color: white; }
+        .vibe-upscale-fancy { background-color: #3a0ca3; color: white; }
+        .vibe-casual-lowkey { background-color: #adb5bd; color: white; }
+        .vibe-unique-special { background-color: #f15bb5; color: white; }
+        .vibe-trendy-cool { background-color: #023e8a; color: white; }
+        .vibe-budget-friendly { background-color: #38b000; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container my-4">
+        <!-- Header -->
+        <header class="text-center mb-4">
+            <h1 class="display-4 brand">Vibe Search™</h1>
+            <p class="lead">Find the perfect place in NYC that matches your exact vibe</p>
+            <div class="d-flex justify-content-center">
+                <span class="badge bg-light text-secondary me-2">Powered by RAG</span>
+                <span class="badge bg-light text-secondary">Using {{ embedding_model }}</span>
+            </div>
+        </header>
+        
+        <!-- Search Section -->
+        <div class="search-container">
+            <div class="input-group mb-3">
+                <input type="text" id="search-input" class="form-control search-input" 
+                       placeholder="How are you feeling today? Try 'sunny brunch spot with outdoor seating'" 
+                       aria-label="Search query">
+                <button class="btn btn-primary search-button" type="button" id="search-button">
+                    <i class="bi bi-search me-1"></i> Search
+                </button>
+            </div>
+
+            <div class="d-flex justify-content-center mb-3">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="matchMode" id="vibeMode" value="vibe" checked>
+                    <label class="form-check-label" for="vibeMode">Vibe Search</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="matchMode" id="strictMode" value="strict">
+                    <label class="form-check-label" for="strictMode">Strict Search</label>
+                </div>
+            </div>
+            
+            <div class="mt-2">
+                <div class="fw-bold mb-1">Try searching for:</div>
+                <div class="d-flex flex-wrap">
+                    <span class="example-query bg-light text-dark">cafes to cowork from</span>
+                    <span class="example-query bg-light text-dark">matcha latte in east village</span>
+                    <span class="example-query bg-light text-dark">where to spend a sunny day</span>
+                    <span class="example-query bg-light text-dark">romantic date night spot</span>
+                    <span class="example-query bg-light text-dark">bars with dancing and good music</span>
+                    <span class="example-query bg-light text-dark">unique dinner experience</span>
+                    <span class="example-query bg-light text-dark">where to find hot guys</span>
+                    <span class="example-query bg-light text-dark">dance-y bars that have disco balls</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading Spinner -->
+        <div class="loading-container text-center" id="loading-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="mt-2">Finding the perfect places for you...</div>
+        </div>
+        
+        <!-- Search Stats -->
+        <div class="search-stats d-none" id="search-stats"></div>
+        
+        <!-- Expanded Query Info -->
+        <div class="expanded-query d-none" id="expanded-query"></div>
+        
+        <!-- Results Container -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="results-container"></div>
+        
+        <!-- No Results Message -->
+        <div class="alert alert-info d-none" id="no-results">
+            No places found matching your search. Try a different query or check out the example searches above.
+        </div>
+        
+        <!-- Footer -->
+        <footer class="text-center">
+            <p>Vibe Search™ - NYU Datathon Project - RAG Implementation</p>
+        </footer>
+    </div>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Application Scripts -->
+    <script>
+        // DOM elements
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const loadingContainer = document.getElementById('loading-container');
+        const resultsContainer = document.getElementById('results-container');
+        const searchStats = document.getElementById('search-stats');
+        const expandedQuery = document.getElementById('expanded-query');
+        const noResults = document.getElementById('no-results');
+        const exampleQueries = document.querySelectorAll('.example-query');
+        
+        // Initialize popovers
+        function initPopovers() {
+            const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+            [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+        }
+        
+        // Helper to format a vibe tag with appropriate styling
+        function formatVibeTag(vibe) {
+            // Convert format: vibe_name -> vibe-name
+            const vibeClass = 'vibe-' + vibe.replace(/_/g, '-');
+            return `<span class="badge vibe-tag ${vibeClass}">${vibe.replace(/_/g, ' ')}</span>`;
+        }
+        
+        // Search function
+        async function performSearch() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+            
+            // Show loading state
+            loadingContainer.style.display = 'block';
+            resultsContainer.innerHTML = '';
+            searchStats.classList.add('d-none');
+            expandedQuery.classList.add('d-none');
+            noResults.classList.add('d-none');
+            
+            try {
+                // Call the search API
+                const matchMode = document.querySelector('input[name="matchMode"]:checked').value;
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        query: query,
+                        limit: 20,
+                        explanation: true,
+                        match_mode: matchMode  
+                    })
+                });
+                
+                const data = await response.json();
+                const places = data.places || [];
+                
+                // Display stats
+                searchStats.textContent = data.message || 
+                    `Found ${places.length} places in ${data.processing_time.toFixed(2)} seconds`;
+                searchStats.classList.remove('d-none');
+                
+                // Display expanded query if available
+                if (data.expanded_query && data.expanded_query !== query) {
+                    expandedQuery.textContent = `Expanded search: ${data.expanded_query}`;
+                    expandedQuery.classList.remove('d-none');
+                }
+                
+                // Show no results message if needed
+                if (places.length === 0) {
+                    noResults.classList.remove('d-none');
+                    return;
+                }
+                
+                // Display results
+                places.forEach((place, index) => {
+                    const matchScore = Math.round(place.score * 100);
+                    
+                    // Create card HTML
+                    const cardHtml = `
+                        <div class="card h-100">
+                            ${place.image_url ? 
+                                `<img src="${place.image_url}" class="card-img-top" alt="${place.name}" 
+                                    onerror="this.style.display='none'">
+                                <span class="score-badge">${matchScore}% match</span>` 
+                                : ''}
+                            <div class="card-body">
+                                <h5 class="card-title">${place.emoji} ${place.name}</h5>
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-geo-alt me-1"></i>
+                                    <span class="location-badge">${place.neighborhood || 'New York, NY'}</span>
+                                </div>
+                                <p class="card-text small">${place.short_description || ''}</p>
+                                ${place.explanation ? 
+                                    `<div class="explanation">
+                                        <i class="bi bi-lightbulb me-1"></i> ${place.explanation}
+                                    </div>` : ''}
+                                <div class="d-flex flex-wrap mb-2">
+                                    ${place.vibe_tags?.map(tag => formatVibeTag(tag)).join('') || ''}
+                                </div>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                <a href="https://maps.google.com/?q=${encodeURIComponent(place.name + ', ' + (place.neighborhood || 'New York, NY'))}" 
+                                    class="map-link btn btn-sm btn-outline-primary" target="_blank">
+                                    <i class="bi bi-map"></i> Maps
+                                </a>
+                                <button class="btn btn-sm btn-outline-secondary"
+                                    data-bs-toggle="popover"
+                                    data-bs-placement="top"
+                                    data-bs-custom-class="map-popover"
+                                    data-bs-html="true"
+                                    data-bs-title="${place.name}"
+                                    data-bs-content="<div><strong>Location:</strong> ${place.neighborhood || 'New York'}</div><div><strong>Match:</strong> ${matchScore}%</div>">
+                                    <i class="bi bi-info-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add to container
+                    const colElement = document.createElement('div');
+                    colElement.className = 'col';
+                    colElement.innerHTML = cardHtml;
+                    resultsContainer.appendChild(colElement);
+                });
+                
+                // Initialize any Bootstrap components in new content
+                initPopovers();
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                resultsContainer.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            There was an error processing your search. Please try again.
+                        </div>
+                    </div>
+                `;
+            } finally {
+                // Hide loading state
+                loadingContainer.style.display = 'none';
+            }
+        }
+        
+        // Event listeners
+        searchButton.addEventListener('click', performSearch);
+        
+        searchInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // Example query click handlers
+        exampleQueries.forEach(example => {
+            example.addEventListener('click', () => {
+                searchInput.value = example.textContent;
+                performSearch();
+            });
+        });
+        
+        // Check URL parameters for initial search
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialQuery = urlParams.get('q');
+            if (initialQuery) {
+                searchInput.value = initialQuery;
+                performSearch();
+            }
+        });
+    </script>
+</body>
+</html>
