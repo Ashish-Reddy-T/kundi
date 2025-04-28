@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Place-Specific CLIP Image Analyzer
 Analyzes images of restaurants, bars, parks, attractions, museums, and rooftop lounges
