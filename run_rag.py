@@ -23,9 +23,10 @@ def parse_args():
                       default=DEFAULT_EMBED_MODEL, help="Embedding model to use")
     parser.add_argument("--no-reload", action="store_true", help="Disable auto-reload on file changes")
     parser.add_argument("--build-index", action="store_true", help="Build the search index before starting")
+    parser.add_argument("--auto-yes", action="store_true", help="Automatically answer 'yes' to all prompts")
     return parser.parse_args()
 
-def check_dependencies():
+def check_dependencies(auto_yes=False):
     """Check if required dependencies are installed"""
     required = [
         "fastapi", "uvicorn", "numpy", "pandas", "faiss-cpu",
@@ -41,8 +42,13 @@ def check_dependencies():
     
     if missing:
         print(f"Missing dependencies: {', '.join(missing)}")
-        install = input("Install missing dependencies? (y/n): ")
-        if install.lower() == "y":
+        if auto_yes or os.environ.get("AUTO_YES") == "1":
+            install_choice = "y"
+        else:
+            install = input("Install missing dependencies? (y/n): ")
+            install_choice = install.lower()
+            
+        if install_choice == "y":
             try:
                 subprocess.run([sys.executable, "-m", "pip", "install"] + missing, check=True)
                 print("Dependencies installed.")
@@ -53,15 +59,20 @@ def check_dependencies():
             print("Cannot continue without required dependencies.")
             sys.exit(1)
 
-def check_index(model_name):
+def check_index(model_name, auto_yes=False):
     """Check if the index for the specified model exists"""
     index_path = os.path.join("ingestion", f"final_index_{model_name}.faiss")
     metadata_path = os.path.join("ingestion", f"final_metadata_{model_name}.pkl")
     
     if not (os.path.exists(index_path) and os.path.exists(metadata_path)):
         print(f"Index files for model '{model_name}' not found.")
-        build = input("Build the index now? (y/n): ")
-        if build.lower() == "y":
+        if auto_yes or os.environ.get("AUTO_YES") == "1":
+            build_choice = "y"
+        else:
+            build = input("Build the index now? (y/n): ")
+            build_choice = build.lower()
+            
+        if build_choice == "y":
             build_index(model_name)
         else:
             print("Warning: Running without index files. Search will not work properly.")
@@ -118,8 +129,12 @@ def main():
     
     print("Starting Vibe Search RAG application...")
     
+    # Set AUTO_YES environment variable if --auto-yes flag is set
+    if args.auto_yes:
+        os.environ["AUTO_YES"] = "1"
+    
     # Check dependencies
-    check_dependencies()
+    check_dependencies(args.auto_yes)
     
     # Set up environment
     setup_environment(args)
@@ -128,7 +143,7 @@ def main():
     if args.build_index:
         build_index(args.embedding_model)
     else:
-        check_index(args.embedding_model)
+        check_index(args.embedding_model, args.auto_yes)
     
     # Run the app with the correct model
     try:
