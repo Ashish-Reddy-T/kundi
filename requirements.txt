@@ -15,7 +15,6 @@ open-clip-torch>=2.20.0
 # Additional dependencies for visual analysis
 torch>=2.0.0
 torchvision>=0.15.0
-open_clip>=2.20.0
 # For image processing
 matplotlib>=3.5.0
 scikit-image>=0.19.0
