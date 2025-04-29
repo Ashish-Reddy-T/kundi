@@ -17,9 +17,9 @@ A sophisticated place recommendation system built for the lovely _DATATHON_. Thi
 
 ---
 
-## Quick Start
+## Start
 
-### Installation
+### Quick Installation
 
 ```bash
 # Clone the repository
