@@ -29,7 +29,7 @@ cd kundi
 # ![PLEASE MOVE THE `places.csv`, `media.csv` and `reviews.csv` files into this folder]!
 
 # Direct Run (Will install dependencies)
-python rag_run.py --build-index --auto-yes # (Uses bge-large and 0.7:text_ratio :: 0.3:image_ratio)
+python run_rag.py --build-index --auto-yes # (Uses bge-large and 0.7:text_ratio :: 0.3:image_ratio)
 ```
 
 ### Complete Implementation Steps
