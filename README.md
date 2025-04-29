@@ -29,7 +29,7 @@ cd kundi
 # ![PLEASE MOVE THE `places.csv`, `media.csv` and `reviews.csv` files into this folder]!
 
 # Direct Run (Will install dependencies)
-python rag_run.py --build-index --embedding-model bge-large --auto-yes
+python rag_run.py --build-index --auto-yes
 ```
 
 ### Complete Implementation Steps
