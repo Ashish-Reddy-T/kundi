@@ -4,6 +4,11 @@ A sophisticated place recommendation system built for the lovely _DATATHON_. Thi
 
 ---
 
+# IF YOU WOULD LIKE TO EXPERIENCE THE REAL RAG-SEARCH (pls visit this github repo)
+[TRUE RAG for CORNER](https://github.com/Ashish-Reddy-T/allNew.git)
+
+---
+
 ## Key Features
 
 - **Multimodal Understanding**: Combines both textual and visual analysis to truly understand place characteristics
