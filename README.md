@@ -9,6 +9,12 @@ A sophisticated place recommendation system built for the lovely _DATATHON_. Thi
 
 ---
 
+# DEMO link
+
+[DEMO](https://www.youtube.com/watch?v=pe6IovJ92xs)
+
+---
+
 ## Key Features
 
 - **Multimodal Understanding**: Combines both textual and visual analysis to truly understand place characteristics
